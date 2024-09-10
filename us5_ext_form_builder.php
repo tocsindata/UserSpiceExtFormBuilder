@@ -189,6 +189,29 @@ if (!function_exists('FormBuilder')) {
                         <input id="'.$fieldName.'" name="'.$fieldName.'" type="number" min="1900" max="2099" step="1" value="'.$fieldValue.'" class="form-control input-md">
                         </div>
                         </div>';
+            } elseif (strpos($fieldType, 'set') !== false) {
+                // Handle SET type
+                preg_match("/^set\((.+)\)$/i", $fieldType, $matches); // Extract values from the SET definition
+                $options = [];
+                if (!empty($matches[1])) {
+                    $options = str_getcsv($matches[1], ',', "'");
+                }
+
+                $out .= '<!-- SET input-->
+                        <div class="form-group">
+                        <label class="col-md-4 control-label" for="'.$fieldName.'">'.$fieldLabel.'</label>  
+                        <div class="col-md-4">
+                        <select id="'.$fieldName.'" name="'.$fieldName.'" class="form-control">';
+                
+                // Generate options for the SET select input
+                foreach ($options as $option) {
+                    $selected = ($fieldValue == $option) ? 'selected' : '';
+                    $out .= '<option value="'.htmlspecialchars($option).'" '.$selected.'>'.htmlspecialchars($option).'</option>';
+                }
+
+                $out .= '   </select>
+                        </div>
+                        </div>';
             } else {
                 // Handle other or unknown types
                 $out .= '<!-- Unknown type input - '.$fieldType.' -->';
